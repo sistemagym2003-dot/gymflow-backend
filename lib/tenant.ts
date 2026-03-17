@@ -18,13 +18,13 @@ const normalizedLocalhost = normalize("http://localhost:3000");
 
 export function getTenantFromOrigin(origin: string | null): Tenant {
   if (!origin) {
-    return "gymflow";
+    return "primefitness";
   }
 
   const normalizedOrigin = normalize(origin);
 
   if (normalizedOrigin === normalizedLocalhost) {
-    return "gymflow";
+    return "primefitness";
   }
 
   if (normalizedOrigin === normalizedGymflow) {
