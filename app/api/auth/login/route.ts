@@ -1,9 +1,10 @@
 import { NextRequest } from "next/server";
-import { query } from "@/lib/db";
+import { queryForTenant } from "@/lib/db";
 import { verifyPassword } from "@/lib/password";
 import { signToken } from "@/lib/auth/jwt";
 import { getCorsHeaders } from "@/lib/cors";
 import { jsonResponse, errorResponse } from "@/lib/api-response";
+import { getTenantFromOrigin } from "@/lib/tenant";
 
 interface UsuarioRow {
   id: string;
@@ -26,6 +27,7 @@ export async function OPTIONS() {
 export async function POST(request: NextRequest) {
   const origin = request.headers.get("Origin");
   try {
+    const tenant = getTenantFromOrigin(origin);
     const body = await request.json();
     const correo = typeof body.correo === "string" ? body.correo.trim() : "";
     const contraseña = typeof body.contraseña === "string" ? body.contraseña : "";
@@ -44,7 +46,8 @@ export async function POST(request: NextRequest) {
       return errorResponse("Rol no válido", 400, origin);
     }
 
-    const { rows: usuarios } = await query<UsuarioRow>(
+    const { rows: usuarios } = await queryForTenant<UsuarioRow>(
+      tenant,
       `SELECT id, gimnasio_id, sucursal_id, correo, nombre_completo, telefono, activo, password_hash
        FROM usuarios WHERE correo = $1 LIMIT 1`,
       [correo]
@@ -63,7 +66,8 @@ export async function POST(request: NextRequest) {
       return errorResponse("Credenciales inválidas", 401, origin);
     }
 
-    const { rows: rolesRows } = await query<{ rol_id: number }>(
+    const { rows: rolesRows } = await queryForTenant<{ rol_id: number }>(
+      tenant,
       `SELECT ur.rol_id FROM usuarios_roles ur
        JOIN roles r ON r.id = ur.rol_id
        WHERE ur.usuario_id = $1 AND r.nombre = $2`,

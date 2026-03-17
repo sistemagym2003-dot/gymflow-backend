@@ -57,11 +57,11 @@ La API queda en `http://localhost:4000`. El frontend debe llamar a esta URL en d
 
 1. Crear un **Web Service** en Render.
 2. Conectar el repositorio y configurar:
-   - **Root Directory**: `backend`
+   - **Root Directory**: vacío si este backend es la raíz del repo; si está en una subcarpeta (ej. `backend/`), poner `backend`.
    - **Build Command**: `npm install && npm run build`
-   - **Start Command**: `npm run start` (o `node .next/standalone/server.js` si usas `output: 'standalone'`; con el script `start` de este proyecto basta)
-3. Añadir las variables de entorno: `DATABASE_URL`, `JWT_SECRET`, `FRONTEND_URL` (URL del frontend en Vercel).
-4. Desplegar. La URL base de la API será la que asigne Render (ej. `https://gymflow-api.onrender.com`). Configurar en el frontend esta URL para las llamadas en producción.
+   - **Start Command**: `npm run start`
+3. Añadir las variables de entorno: `DATABASE_URL`, `JWT_SECRET`, `FRONTEND_URL` (URL del frontend en Vercel, ej. `https://gymflow.vercel.app`, sin barra final).
+4. Desplegar. La URL base de la API será la que asigne Render (ej. `https://gymflow-api.onrender.com`). Esa misma URL se configura en el frontend como `NEXT_PUBLIC_API_URL` en Vercel.
 
 ## Notas
 
