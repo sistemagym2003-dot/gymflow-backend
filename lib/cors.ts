@@ -7,16 +7,34 @@ const PRIMEFITNESS_ORIGIN = process.env.FRONTEND_URL_PRIMEFITNESS;
 
 const LOCALHOST_ORIGIN = "http://localhost:3000";
 
-const ALLOWED_ORIGINS = [
-  GYMFLOW_ORIGIN,
-  PRIMEFITNESS_ORIGIN,
-  LOCALHOST_ORIGIN,
-].filter(Boolean) as string[];
+function normalize(url: string): string {
+  return url.endsWith("/") ? url.slice(0, -1) : url;
+}
+
+const normalizedGymflow = normalize(GYMFLOW_ORIGIN);
+const normalizedPrime =
+  PRIMEFITNESS_ORIGIN != null ? normalize(PRIMEFITNESS_ORIGIN) : null;
+const normalizedLocalhost = normalize(LOCALHOST_ORIGIN);
 
 function resolveAllowedOrigin(origin?: string | null): string {
-  if (origin && ALLOWED_ORIGINS.includes(origin)) {
+  if (!origin) {
+    return GYMFLOW_ORIGIN;
+  }
+
+  const normalizedOrigin = normalize(origin);
+
+  if (normalizedOrigin === normalizedLocalhost) {
     return origin;
   }
+
+  if (normalizedOrigin === normalizedGymflow) {
+    return origin;
+  }
+
+  if (normalizedPrime && normalizedOrigin === normalizedPrime) {
+    return origin;
+  }
+
   return GYMFLOW_ORIGIN;
 }
 

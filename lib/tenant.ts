@@ -7,25 +7,35 @@ const GYMFLOW_ORIGIN =
 
 const PRIMEFITNESS_ORIGIN = process.env.FRONTEND_URL_PRIMEFITNESS;
 
+function normalize(url: string): string {
+  return url.endsWith("/") ? url.slice(0, -1) : url;
+}
+
+const normalizedGymflow = normalize(GYMFLOW_ORIGIN);
+const normalizedPrime =
+  PRIMEFITNESS_ORIGIN != null ? normalize(PRIMEFITNESS_ORIGIN) : null;
+const normalizedLocalhost = normalize("http://localhost:3000");
+
 export function getTenantFromOrigin(origin: string | null): Tenant {
   if (!origin) {
-    // Por defecto, tratamos orígenes desconocidos como GymFlow para evitar romper llamadas internas.
     return "gymflow";
   }
 
-  if (origin === "http://localhost:3000") {
+  const normalizedOrigin = normalize(origin);
+
+  if (normalizedOrigin === normalizedLocalhost) {
     return "gymflow";
   }
 
-  if (origin === GYMFLOW_ORIGIN) {
+  if (normalizedOrigin === normalizedGymflow) {
     return "gymflow";
   }
 
-  if (origin === PRIMEFITNESS_ORIGIN) {
+  if (normalizedPrime && normalizedOrigin === normalizedPrime) {
     return "primefitness";
   }
 
-  // Cualquier otro origen no está permitido.
   throw new Error("Origen no permitido");
 }
+
 
