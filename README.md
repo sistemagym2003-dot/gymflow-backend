@@ -55,6 +55,12 @@ La API queda en `http://localhost:4000`. El frontend debe llamar a esta URL en d
 - **POST /api/auth/logout**  
   Cierre de sesión. El backend responde OK; la invalidación real se hace en el cliente (descartar el token). No se mantiene blacklist de tokens en el servidor.
 
+- **POST /api/auth/change-password**  
+  Requiere autenticación.  
+  Body: `{ "contraseñaActual": "...", "nuevaContraseña": "..." }`  
+  Header: `Authorization: Bearer <token>`.  
+  Valida la contraseña actual y actualiza `usuarios.password_hash` con bcrypt. La nueva contraseña debe tener al menos 8 caracteres.
+
 ### Socios (requieren autenticación)
 
 - **PATCH /api/socios/:id**  
