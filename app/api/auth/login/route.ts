@@ -25,7 +25,7 @@ const VALID_ROLES_GYMFLOW = [
   "socio",
 ] as const;
 
-const VALID_ROLES_PRIMEFITNESS = ["recepcion", "socio"] as const;
+const VALID_ROLES_PRIMEFITNESS = ["recepcion", "socio", "entrenador"] as const;
 
 export async function OPTIONS() {
   return new Response(null, {
