@@ -90,7 +90,9 @@ export async function POST(request: NextRequest) {
     await queryForTenant(
       tenant,
       `UPDATE usuarios
-       SET password_hash = $1, actualizado_en = now()
+       SET password_hash = $1,
+           requiere_cambio_password = false,
+           actualizado_en = now()
        WHERE id = $2`,
       [newHash, usuario.id]
     );

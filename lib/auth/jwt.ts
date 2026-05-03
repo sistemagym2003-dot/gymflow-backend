@@ -13,6 +13,8 @@ export interface JwtPayload {
   rol: string;       // nombre del rol con el que hizo login
   gimnasio_id: number | null;
   sucursal_id: number | null;
+  /** Si true, el cliente debe forzar cambio de contraseña antes de usar la app (PrimeFitness, etc.). */
+  requiere_cambio_password?: boolean;
   iat?: number;
   exp?: number;
 }
@@ -20,12 +22,16 @@ export interface JwtPayload {
 const DEFAULT_EXP = "7d";
 
 export async function signToken(payload: Omit<JwtPayload, "iat" | "exp">): Promise<string> {
-  return new SignJWT({
+  const body: Record<string, unknown> = {
     sub: payload.sub,
     rol: payload.rol,
     gimnasio_id: payload.gimnasio_id ?? null,
     sucursal_id: payload.sucursal_id ?? null,
-  })
+  };
+  if (typeof payload.requiere_cambio_password === "boolean") {
+    body.requiere_cambio_password = payload.requiere_cambio_password;
+  }
+  return new SignJWT(body)
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime(DEFAULT_EXP)
@@ -39,11 +45,14 @@ export async function verifyToken(token: string): Promise<JwtPayload> {
   if (!sub || typeof sub !== "string" || !rol || typeof rol !== "string") {
     throw new Error("Token inválido");
   }
+  const reqFlag = payload.requiere_cambio_password;
   return {
     sub,
     rol,
     gimnasio_id: (payload.gimnasio_id as number) ?? null,
     sucursal_id: (payload.sucursal_id as number) ?? null,
+    requiere_cambio_password:
+      typeof reqFlag === "boolean" ? reqFlag : undefined,
     iat: payload.iat as number,
     exp: payload.exp as number,
   };

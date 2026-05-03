@@ -15,6 +15,7 @@ interface UsuarioRow {
   telefono: string | null;
   activo: boolean;
   password_hash: string;
+  requiere_cambio_password: boolean;
 }
 
 const VALID_ROLES_GYMFLOW = [
@@ -124,7 +125,8 @@ export async function POST(request: NextRequest) {
 
     const { rows: usuarios } = await queryForTenant<UsuarioRow>(
       tenant,
-      `SELECT id, gimnasio_id, sucursal_id, correo, nombre_completo, telefono, activo, password_hash
+      `SELECT id, gimnasio_id, sucursal_id, correo, nombre_completo, telefono, activo, password_hash,
+              COALESCE(requiere_cambio_password, false) AS requiere_cambio_password
        FROM usuarios WHERE correo = $1 LIMIT 1`,
       [correo]
     );
@@ -177,6 +179,7 @@ export async function POST(request: NextRequest) {
       rol: effectiveRol,
       gimnasio_id: usuario.gimnasio_id,
       sucursal_id: usuario.sucursal_id,
+      requiere_cambio_password: usuario.requiere_cambio_password,
     });
 
     return jsonResponse(
@@ -190,6 +193,7 @@ export async function POST(request: NextRequest) {
           gimnasio_id: usuario.gimnasio_id,
           sucursal_id: usuario.sucursal_id,
           rol: effectiveRol,
+          requiere_cambio_password: usuario.requiere_cambio_password,
         },
       },
       200,
