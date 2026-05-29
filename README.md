@@ -21,8 +21,10 @@ Copia `.env.example` a `.env` y rellena los valores (sin subir `.env` al repo):
 | Variable | Descripción |
 |----------|-------------|
 | `DATABASE_URL` | Connection string de Postgres (Supabase: Project Settings → Database → Connection string URI) |
+| `DATABASE_URL_ADMIN` | Connection string para el panel admin. Si no se define, usa `DATABASE_URL` o `DATABASE_URL_GYMFLOW` |
 | `JWT_SECRET` | Clave secreta para firmar JWT (mínimo 32 caracteres) |
 | `FRONTEND_URL` | Origen del frontend para CORS (ej. `https://tu-app.vercel.app` o `http://localhost:3000` en desarrollo) |
+| `FRONTEND_URL_ADMIN` | Origen de `admin.fortiscoach.cl` para CORS |
 | `SMTP_HOST` | Host SMTP de Brevo (`smtp-relay.brevo.com`) |
 | `SMTP_PORT` | Puerto SMTP (`587`) |
 | `SMTP_SECURE` | `false` para Brevo SMTP estándar |
@@ -44,6 +46,11 @@ La API queda en `http://localhost:4000`. El frontend debe llamar a esta URL en d
 ## Endpoints
 
 ### Autenticación
+
+- **POST /api/admin/auth/login**  
+  Body: `{ "correo": "...", "contraseña": "..." }`  
+  Valida solo usuarios marcados como admins globales (`usuarios.es_admin_fortis = true` + `admin_fortis_usuarios`).  
+  Respuesta: `{ "token": "...", "usuario": { "id", "correo", "nombre_completo", "rol": "admin_fortis", "nivel_admin", ... } }`
 
 - **POST /api/auth/login**  
   Body: `{ "correo": "...", "contraseña": "...", "rol": "recepcion" }`  

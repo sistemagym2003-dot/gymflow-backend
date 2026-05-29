@@ -4,6 +4,7 @@ const GYMFLOW_ORIGIN =
   "http://localhost:3000";
 
 const PRIMEFITNESS_ORIGIN = process.env.FRONTEND_URL_PRIMEFITNESS;
+const ADMIN_ORIGIN = process.env.FRONTEND_URL_ADMIN;
 
 const LOCALHOST_ORIGIN = "http://localhost:3000";
 
@@ -14,6 +15,8 @@ function normalize(url: string): string {
 const normalizedGymflow = normalize(GYMFLOW_ORIGIN);
 const normalizedPrime =
   PRIMEFITNESS_ORIGIN != null ? normalize(PRIMEFITNESS_ORIGIN) : null;
+const normalizedAdmin =
+  ADMIN_ORIGIN != null ? normalize(ADMIN_ORIGIN) : null;
 const normalizedLocalhost = normalize(LOCALHOST_ORIGIN);
 
 function resolveAllowedOrigin(origin?: string | null): string {
@@ -35,6 +38,10 @@ function resolveAllowedOrigin(origin?: string | null): string {
     return origin;
   }
 
+  if (normalizedAdmin && normalizedOrigin === normalizedAdmin) {
+    return origin;
+  }
+
   return GYMFLOW_ORIGIN;
 }
 
@@ -47,4 +54,3 @@ export function getCorsHeaders(origin?: string | null): Record<string, string> {
     "Access-Control-Max-Age": "86400",
   };
 }
-

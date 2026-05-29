@@ -4,6 +4,7 @@ import type { Tenant } from "./tenant";
 type DbTenant = Tenant;
 
 let defaultPool: Pool | null = null;
+let adminPool: Pool | null = null;
 const tenantPools: Partial<Record<DbTenant, Pool>> = {};
 
 function createPool(connectionString: string): Pool {
@@ -21,6 +22,19 @@ function getDefaultConnectionString(): string {
   if (!connectionString) {
     throw new Error(
       "DATABASE_URL o DATABASE_URL_GYMFLOW deben estar definidas"
+    );
+  }
+  return connectionString;
+}
+
+function getAdminConnectionString(): string {
+  const connectionString =
+    process.env.DATABASE_URL_ADMIN ??
+    process.env.DATABASE_URL ??
+    process.env.DATABASE_URL_GYMFLOW;
+  if (!connectionString) {
+    throw new Error(
+      "DATABASE_URL_ADMIN, DATABASE_URL o DATABASE_URL_GYMFLOW deben estar definidas"
     );
   }
   return connectionString;
@@ -52,6 +66,14 @@ function getPool(): Pool {
     defaultPool = createPool(connectionString);
   }
   return defaultPool;
+}
+
+function getAdminPool(): Pool {
+  if (!adminPool) {
+    const connectionString = getAdminConnectionString();
+    adminPool = createPool(connectionString);
+  }
+  return adminPool;
 }
 
 function getPoolForTenant(tenant: DbTenant): Pool {
@@ -94,3 +116,16 @@ export async function queryForTenant<T = unknown>(
   }
 }
 
+export async function queryForAdmin<T = unknown>(
+  text: string,
+  params?: unknown[]
+): Promise<{ rows: T[]; rowCount: number }> {
+  const p = getAdminPool();
+  const client = await p.connect();
+  try {
+    const result = await client.query(text, params);
+    return { rows: result.rows as T[], rowCount: result.rowCount ?? 0 };
+  } finally {
+    client.release();
+  }
+}
